@@ -4,3 +4,5 @@ node_modules/
 bot-manager/bots/
 .claude/
 afk/
+.venv/
+bot-manager/bots/bin/MinecraftClient
