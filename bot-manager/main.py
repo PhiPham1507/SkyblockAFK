@@ -41,6 +41,14 @@ mcc_path = Path("bin/MinecraftClient").resolve()
 
 #mcc_path is a Path object, must convert to a string to run
 #The first argument of the run() is a list, where the first argument is the program, and the remaining are command line arguments
-subprocess.run([str(mcc_path), "config.ini"], cwd=bot_dir)
+#subprocess.run([str(mcc_path), "config.ini"], cwd=bot_dir)
 
-print("Wrote", config_path)
+
+#MCC asks for the cursor's position of our terminal so that messages won't get mixed up with what being displayed
+#Setting stdin to DEVNULL makes MCC doesn't ask.
+proc = subprocess.Popen([str(mcc_path), "config.ini"], cwd=bot_dir, stdin=subprocess.DEVNULL)
+#.run() waits until the process ends for main() to continue. While .Popen() returns
+#immedietly to the flow of main
+
+print("Hi")
+print(proc.pid)
