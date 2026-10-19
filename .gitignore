@@ -1,0 +1,6 @@
+.env
+node_modules/
+*.ini
+bot-manager/bots/
+.claude/
+afk/
