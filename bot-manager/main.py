@@ -1,15 +1,27 @@
 import os
 from pathlib import Path
 import subprocess
+import time
+import threading
+
+
+
+def read_output(proc):
+    for line in proc.stdout:
+        text = line.decode("utf-8")
+        print(text)
+    print("reader thread is done")
+
 
 # Stand-in for a Bot row from the database
 bot = {
     "id": "test1",
     "login": os.environ["MC_LOGIN"],
-    "server": "manacube.com",
+    "server": "survival.manacube.com",
     "minecraft_version": "26.2",
 }
 
+#The f""" is to start a big chunk of string, and it allows python code insertion"
 config_text = f"""[Main.General]
 Account = {{ Login = "{bot['login']}", Password = "" }}
 Server = {{ Host = "{bot['server']}" }}
@@ -37,9 +49,10 @@ mcc_path = Path("bin/MinecraftClient").resolve()
 
 # stdin=DEVNULL: stops MCC from asking the terminal for the cursor position
 proc = subprocess.Popen([str(mcc_path), "config.ini"], cwd=bot_dir, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE)
-for line in proc.stdout:
-    text = line.decode("utf-8")
-    if "microsoft.com/link" in text:
-        print(text)
+reader = threading.Thread(target=read_output, args=(proc,))
+reader.start()
+time.sleep(60)
+proc.terminate()
+reader.join(timeout=5)
+print(reader.is_alive())
 
-proc.wait()
