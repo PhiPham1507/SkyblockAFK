@@ -6,12 +6,30 @@ import threading
 
 
 
+#Set up the configuration file. Content as a string
+def make_config(bot) -> str:
+    #The f""" is to start a big chunk of string, and it allows python code insertion"
+    return f"""[Main.General]
+    Account = {{ Login = "{bot['login']}", Password = "" }}
+    Server = {{ Host = "{bot['server']}" }}
+    AccountType = "microsoft"
+    Method = "mcc"
+
+    [Main.Advanced]
+    EnableSentry = false
+    MinecraftVersion = "{bot['minecraft_version']}"
+    TerrainAndMovements = false
+    InventoryHandling = false
+    EntityHandling = false
+    SessionCache = "disk"
+    """
+
+#Function for thread. Simply outputting streams of data
 def read_output(proc):
     for line in proc.stdout:
         text = line.decode("utf-8")
         print(text)
     print("reader thread is done")
-
 
 # Stand-in for a Bot row from the database
 bot = {
@@ -21,21 +39,8 @@ bot = {
     "minecraft_version": "26.2",
 }
 
-#The f""" is to start a big chunk of string, and it allows python code insertion"
-config_text = f"""[Main.General]
-Account = {{ Login = "{bot['login']}", Password = "" }}
-Server = {{ Host = "{bot['server']}" }}
-AccountType = "microsoft"
-Method = "mcc"
 
-[Main.Advanced]
-EnableSentry = false
-MinecraftVersion = "{bot['minecraft_version']}"
-TerrainAndMovements = false
-InventoryHandling = false
-EntityHandling = false
-SessionCache = "disk"
-"""
+config_text = make_config(bot)
 
 account_dir = Path("bots") / bot["account"]
 account_dir.mkdir(parents=True, exist_ok=True)
