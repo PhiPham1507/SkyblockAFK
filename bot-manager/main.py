@@ -3,6 +3,43 @@ from pathlib import Path
 import subprocess
 import time
 import threading
+import re
+
+def login_account(account, email):
+    #The default mode has color in its terminal, which makes our regex complicated. Disable it
+    input_string = f"""[Main.General]
+    Account = {{ Login = "{email}", Password = "" }}
+    Server = {{ Host = "" }}
+    AccountType = "microsoft"
+    Method = "mcc"
+
+    [Console.General]
+    ConsoleColorMode = "disable"
+    """
+    account_dir = Path("bots") / account
+    account_dir.mkdir(parents=True, exist_ok=True)
+    config_path = account_dir / "login.ini"
+    config_path.write_text(input_string)
+
+    mcc_path = Path("bin/MinecraftClient").resolve()
+    proc = subprocess.Popen([str(mcc_path), "login.ini"], cwd=account_dir, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE)
+    login = threading.Thread(target=print_login, args=(proc,))
+    login.start()    
+
+def print_login(proc):
+    for line in proc.stdout:
+        text = line.decode("utf-8")
+        if("microsoft.com/link" in text):
+            match = re.search(r"code:\s+([A-Z0-9]+)", text)
+            if(match):
+                print("Success")
+                print(match[1])
+            else:
+
+                print(repr(text))
+        else:
+            print(text)
+
 
 
 def spawn_bot(bot):
@@ -51,12 +88,13 @@ def read_output(proc):
 
 
 # Stand-in for a Bot row from the database
-# bot = {
-#     "account": "Manobee",
-#     "login": os.environ["MC_LOGIN"],
-#     "server": "survival.manacube.com",
-#     "minecraft_version": "26.2",
-# }
+bot = {
+    "account": "logintest",
+    "login": os.environ["MC_LOGIN"],
+    "server": "survival.manacube.com",
+    "minecraft_version": "26.2",
+}
+login_account(bot["account"], bot["login"])
 # bot2 = {
 #     "account": "Manobee",
 #     "login": os.environ["MC_LOGIN"],
