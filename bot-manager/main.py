@@ -4,6 +4,7 @@ import subprocess
 import time
 import threading
 import re
+import shutil
 
 def login_account(account, email):
     #The default mode has color in its terminal, which makes our regex complicated. Disable it
@@ -27,7 +28,7 @@ def login_account(account, email):
     login.start()    
 
 def print_login(proc, account_dir):
-    timer = threading.Timer(90, proc.terminate)
+    timer = threading.Timer(10, proc.terminate)
     timer.start()
     success = False
     for line in proc.stdout:
@@ -35,7 +36,6 @@ def print_login(proc, account_dir):
         if("microsoft.com/link" in text):
             match = re.search(r"code:\s+([A-Z0-9]+)", text)
             if(match):
-                print(str(account_dir))
                 print("Success")
                 print(match[1])
             else:
@@ -47,10 +47,12 @@ def print_login(proc, account_dir):
             print(text)
     if(success):
         print("Logged in Successfully")
+        #Doesn't need to wait for the timer thread.
         timer.cancel()
     else:
         print("Logged in fail")
-        #Delete the directory
+        #Doesn't use account_dir.rmdir() because that assumes empty file
+        shutil.rmtree(account_dir)
 
 def spawn_bot(bot):
     config_text = make_config(bot)
@@ -98,13 +100,13 @@ def read_output(proc):
 
 
 # Stand-in for a Bot row from the database
-# bot = {
-#     "account": "logintest",
-#     "login": os.environ["MC_LOGIN"],
-#     "server": "survival.manacube.com",
-#     "minecraft_version": "26.2",
-# }
-# login_account(bot["account"], bot["login"])
+bot = {
+    "account": "logintest",
+    "login": os.environ["MC_LOGIN"],
+    "server": "survival.manacube.com",
+    "minecraft_version": "26.2",
+}
+login_account(bot["account"], bot["login"])
 # bot2 = {
 #     "account": "Manobee",
 #     "login": os.environ["MC_LOGIN"],
