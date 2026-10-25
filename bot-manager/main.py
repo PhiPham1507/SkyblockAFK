@@ -23,24 +23,34 @@ def login_account(account, email):
 
     mcc_path = Path("bin/MinecraftClient").resolve()
     proc = subprocess.Popen([str(mcc_path), "login.ini"], cwd=account_dir, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE)
-    login = threading.Thread(target=print_login, args=(proc,))
+    login = threading.Thread(target=print_login, args=(proc, account_dir))
     login.start()    
 
-def print_login(proc):
+def print_login(proc, account_dir):
+    timer = threading.Timer(90, proc.terminate)
+    timer.start()
+    success = False
     for line in proc.stdout:
         text = line.decode("utf-8")
         if("microsoft.com/link" in text):
             match = re.search(r"code:\s+([A-Z0-9]+)", text)
             if(match):
+                print(str(account_dir))
                 print("Success")
                 print(match[1])
             else:
-
                 print(repr(text))
+        elif("Server IP" in text or (account_dir / "SessionCache.db").exists()):
+            success = True
+            proc.terminate()
         else:
             print(text)
-
-
+    if(success):
+        print("Logged in Successfully")
+        timer.cancel()
+    else:
+        print("Logged in fail")
+        #Delete the directory
 
 def spawn_bot(bot):
     config_text = make_config(bot)
@@ -88,13 +98,13 @@ def read_output(proc):
 
 
 # Stand-in for a Bot row from the database
-bot = {
-    "account": "logintest",
-    "login": os.environ["MC_LOGIN"],
-    "server": "survival.manacube.com",
-    "minecraft_version": "26.2",
-}
-login_account(bot["account"], bot["login"])
+# bot = {
+#     "account": "logintest",
+#     "login": os.environ["MC_LOGIN"],
+#     "server": "survival.manacube.com",
+#     "minecraft_version": "26.2",
+# }
+# login_account(bot["account"], bot["login"])
 # bot2 = {
 #     "account": "Manobee",
 #     "login": os.environ["MC_LOGIN"],
@@ -102,11 +112,12 @@ login_account(bot["account"], bot["login"])
 #     "minecraft_version": "26.3",
 # }
 # bot3 = {
-#     "account": "Ivoir",
+#     "account": "logintest2",
 #     "login": os.environ["MC_LOGIN2"],
 #     "server": "survival.manacube.com",
 #     "minecraft_version": "26.2",
 # }
+# login_account(bot3["account"], bot3["login"])
 # bot4 = {
 #     "account": "Ivoir",
 #     "login": os.environ["MC_LOGIN2"],
