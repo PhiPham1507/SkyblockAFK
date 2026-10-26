@@ -5,4 +5,8 @@ bot-manager/bots/
 .claude/
 afk/
 .venv/
-bot-manager/bots/bin/MinecraftClient
+bot-manager/bin/MinecraftClient
+learnedStuffMain.md 
+learnedStuffBackend.md
+__pycache__/
+db.sqlite3

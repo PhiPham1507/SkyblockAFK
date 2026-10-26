@@ -28,6 +28,7 @@ def login_account(account, email):
     login.start()    
 
 def print_login(proc, account_dir):
+    #Terminate the process after n seconds, so that stdout reaches EOF and ends loop
     timer = threading.Timer(10, proc.terminate)
     timer.start()
     success = False
@@ -96,6 +97,8 @@ def read_output(proc):
     for line in proc.stdout:
         text = line.decode("utf-8")
         print(text)
+        #In later runs, we'll have a deque of messages. Checking why joining server fails. 
+        #Need to check for potential relogin (if SessionCache.db tokens expire)
     print("reader thread is done")
 
 
