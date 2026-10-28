@@ -9,4 +9,3 @@ bot-manager/bin/MinecraftClient
 learnedStuffMain.md 
 learnedStuffBackend.md
 __pycache__/
-db.sqlite3
