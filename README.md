@@ -33,34 +33,17 @@ stay off.
 
 ```
 SkyblockAFK/
-  frontend/      React + TypeScript app
-  backend/       Django API
-  bot-manager/   Python service that runs the MCC bots
+  frontend/              React + TypeScript app (not started yet)
+  backend/               Django API
+    config/              Django project settings and URLs
+    manage.py
+    requirements.txt
+    .env.example         environment variables the backend needs (copy to .env)
+  bot-manager/           Python service that runs the MCC bots
+    main.py
+    bin/                 MCC binary, downloaded separately (not committed)
+    bots/<account>/      per-account login cache and generated bot configs (not committed)
 ```
-
-## Design notes
-
-- **The database is the source of truth.** Bot config files are generated from the database
-  every time a bot starts, and are never edited by hand.
-- **Tokens are encrypted at rest.** Microsoft refresh tokens are stored encrypted, not hashed,
-  because the bots need the original token to log in. The encryption key never goes in the
-  database.
-- **One token refresh per account.** Microsoft refresh tokens change each time they're used.
-  When one account runs on several servers, its tokens are refreshed in a single place so the
-  bots don't overwrite each other's tokens.
-- **Polling instead of WebSockets.** Bot status and log peeks are polled for a short time and
-  then stop. This keeps the server cheap and simple.
-
-## Roadmap
-
-- [ ] Repo skeleton
-- [ ] Bot manager runs one MCC bot from a generated config
-- [ ] Device-code login through the API
-- [ ] Frontend login flow
-- [ ] Server config form
-- [ ] Bot status and log peek
-- [ ] Payments
-- [ ] Deployment
 
 ## License
 
