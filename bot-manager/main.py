@@ -1,11 +1,16 @@
+""""
+This is the main program, responsible for creating bots that do the afk.
+It will loop forever to keep track of the status of the bots. It 
+continuously fetches data from the database to check if any 
+bot configuration/status has been updated, and will act acccordingly. 
+"""
 import os
 import subprocess
 import time
 import threading
 import re
 import shutil
-from config import *
-JOINED_TEXT = "Server was successfully joined"
+from bot import *
 
 def login_account(account, email):
     #The default mode has color in its terminal, which makes our regex complicated. Disable it
@@ -56,54 +61,7 @@ def print_login(proc, account_dir):
         #Doesn't use account_dir.rmdir() because that assumes empty file
         shutil.rmtree(account_dir)
 
-def spawn_bot(bot):
-    config_text = make_config(bot)
-    account_dir = Path("bots") / bot["account"]
-    account_dir.mkdir(parents=True, exist_ok=True)
-    bot_dir = account_dir / bot["server"]
-    bot_dir.mkdir(parents=True, exist_ok=True)
 
-    # Regenerated on every start: the DB is the source of truth
-    config_path = bot_dir / "config.ini"
-    config_path.write_text(config_text)
-
-    # Absolute, because MCC runs with cwd=bot_dir
-    mcc_path = Path("bin/MinecraftClient").resolve()
-    argument = str(Path(bot["server"]) / "config.ini")
-    # stdin=DEVNULL: stops MCC from asking the terminal for the cursor position. stdin=subprocess.PIPE so that we could input our 
-    # MCC the commands to run when join server
-    proc = subprocess.Popen([str(mcc_path), argument], cwd=account_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    reader = threading.Thread(target=read_output, args=(proc,bot["join_commands"]))
-    reader.start()
-
-
-
-#Function for thread. Simply outputting streams of data
-def read_output(proc, commands):
-    for line in proc.stdout:
-        text = line.decode("utf-8")
-        print(text)
-        #In later runs, we'll have a deque of messages. Checking why joining server fails. 
-        #Need to check for potential relogin (if SessionCache.db tokens expire)
-        if JOINED_TEXT in text:
-            threading.Thread(target=send_join_commands, args=(proc,commands)).start()
-    print("reader thread is done")
-
-def send_join_commands(proc,commands: list[str]) -> None:
-    time.sleep(5)
-    for command in commands:
-        if proc.poll() is not None:
-            print("MCC exited with code", proc.returncode)
-            return
-        send_command(proc, command)
-        time.sleep(2)
-
-def send_command(proc, command: str) -> None:
-    try:
-        proc.stdin.write((command + "\n").encode("utf-8"))
-        proc.stdin.flush()
-    except BrokenPipeError:
-        pass
 # Stand-in for a Bot row from the database
 bot = {
     "account": "Manobee",

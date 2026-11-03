@@ -21,7 +21,7 @@ def _make_account_server_dir(acc : str, server : str) -> Path:
 
 
 def generate_config(bot : dict, text : str) -> str:
-    config_file = make_account_server_dir(bot["account"], bot["server"]) / "config.ini"
+    config_file = _make_account_server_dir(bot["account"], bot["server"]) / "config.ini"
     # Regenerated on every start: the DB is the source of truth
     config_file.write_text(text)
     return str(config_file)
