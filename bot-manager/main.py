@@ -90,6 +90,24 @@ def make_config(bot) -> str:
     InventoryHandling = false
     EntityHandling = false
     SessionCache = "disk"
+    
+    [ChatBot.AntiAFK]
+    Enabled = true
+    Delay = {{ min = 180.0, max = 300.0 }}
+    Command = "/survival"
+    
+    [ChatBot.AutoRelog]
+    Enabled = true
+    Delay = {{ min = 5.0, max = 8.0 }}
+    Retries = 10
+
+    [ChatBot.ScriptScheduler]
+    Enabled = true
+    [[ChatBot.ScriptScheduler.TaskList]]
+    Task_Name = "Send on login"
+    Trigger_On_Interval = {{ Enable = true, MinTime = 7, MaxTime = 10 }}
+    Action = "send hi everyone"
+
     """
 
 #Function for thread. Simply outputting streams of data
@@ -104,12 +122,12 @@ def read_output(proc):
 
 # Stand-in for a Bot row from the database
 bot = {
-    "account": "logintest",
+    "account": "Manobee",
     "login": os.environ["MC_LOGIN"],
     "server": "survival.manacube.com",
     "minecraft_version": "26.2",
 }
-login_account(bot["account"], bot["login"])
+#login_account(bot["account"], bot["login"])
 # bot2 = {
 #     "account": "Manobee",
 #     "login": os.environ["MC_LOGIN"],
@@ -129,7 +147,7 @@ login_account(bot["account"], bot["login"])
 #     "server": "ml.zetrex.net",
 #     "minecraft_version": "26.3",
 # }
-# spawn_bot(bot)
+spawn_bot(bot)
 # spawn_bot(bot2)
 # spawn_bot(bot3)
 # spawn_bot(bot4)
