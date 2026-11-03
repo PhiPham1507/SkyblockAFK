@@ -1,5 +1,5 @@
 from config import *
-from files import *
+from files import MCC_PATH, BOTS_DIR, generate_config
 import subprocess
 import time
 import threading
@@ -22,6 +22,7 @@ def read_output(proc, commands):
         #In later runs, we'll have a deque of messages. Checking why joining server fails. 
         #Need to check for potential relogin (if SessionCache.db tokens expire)
         if JOINED_TEXT in text:
+            print("this has been executed")
             threading.Thread(target=send_join_commands, args=(proc,commands)).start()
     print("reader thread is done")
 
@@ -39,4 +40,5 @@ def send_command(proc, command: str) -> None:
         proc.stdin.write((command + "\n").encode("utf-8"))
         proc.stdin.flush()
     except BrokenPipeError:
+        print("Broken pipe")
         pass

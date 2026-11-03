@@ -10,7 +10,7 @@ import time
 import threading
 import re
 import shutil
-from bot import *
+from bot import spawn_bot
 
 def login_account(account, email):
     #The default mode has color in its terminal, which makes our regex complicated. Disable it

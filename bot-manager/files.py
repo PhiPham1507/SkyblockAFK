@@ -3,14 +3,13 @@ This module is used to generate files and directories. Flow: spawn bot
 calls generate_config, and uses MCC_PATH to run
 """
 from pathlib import Path
-from config import *
 BASE_DIR = Path(__file__).resolve().parent 
 BOTS_DIR = BASE_DIR / "bots"
 MCC_PATH = BASE_DIR / "bin/MinecraftClient"
 
 #This is an internal function
 def _make_account_dir(acc : str)-> Path:
-    account_dir = BOTS_DIR / "acc"
+    account_dir = BOTS_DIR / acc
     account_dir.mkdir(parents=True, exist_ok=True)
     return account_dir
 
