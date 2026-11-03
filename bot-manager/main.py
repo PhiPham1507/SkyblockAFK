@@ -5,6 +5,7 @@ import time
 import threading
 import re
 import shutil
+JOINED_TEXT = "Server was successfully joined"
 
 def login_account(account, email):
     #The default mode has color in its terminal, which makes our regex complicated. Disable it
@@ -69,9 +70,10 @@ def spawn_bot(bot):
     # Absolute, because MCC runs with cwd=bot_dir
     mcc_path = Path("bin/MinecraftClient").resolve()
     argument = str(Path(bot["server"]) / "config.ini")
-    # stdin=DEVNULL: stops MCC from asking the terminal for the cursor position
-    proc = subprocess.Popen([str(mcc_path), argument], cwd=account_dir, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE)
-    reader = threading.Thread(target=read_output, args=(proc,))
+    # stdin=DEVNULL: stops MCC from asking the terminal for the cursor position. stdin=subprocess.PIPE so that we could input our 
+    # MCC the commands to run when join server
+    proc = subprocess.Popen([str(mcc_path), argument], cwd=account_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    reader = threading.Thread(target=read_output, args=(proc,bot["join_commands"]))
     reader.start()
 
 #Set up the configuration file. Content as a string
@@ -94,7 +96,7 @@ def make_config(bot) -> str:
     [ChatBot.AntiAFK]
     Enabled = true
     Delay = {{ min = 180.0, max = 300.0 }}
-    Command = "/survival"
+    Command = "/help"
     
     [ChatBot.AutoRelog]
     Enabled = true
@@ -105,27 +107,44 @@ def make_config(bot) -> str:
     Enabled = true
     [[ChatBot.ScriptScheduler.TaskList]]
     Task_Name = "Send on login"
-    Trigger_On_Interval = {{ Enable = true, MinTime = 7, MaxTime = 10 }}
+    Trigger_On_Interval = {{ Enable = true, MinTime = 60, MaxTime = 600 }}
     Action = "send hi everyone"
 
     """
 
 #Function for thread. Simply outputting streams of data
-def read_output(proc):
+def read_output(proc, commands):
     for line in proc.stdout:
         text = line.decode("utf-8")
         print(text)
         #In later runs, we'll have a deque of messages. Checking why joining server fails. 
         #Need to check for potential relogin (if SessionCache.db tokens expire)
+        if JOINED_TEXT in text:
+            threading.Thread(target=send_join_commands, args=(proc,commands)).start()
     print("reader thread is done")
 
+def send_join_commands(proc,commands: list[str]) -> None:
+    time.sleep(5)
+    for command in commands:
+        if proc.poll() is not None:
+            print("MCC exited with code", proc.returncode)
+            return
+        send_command(proc, command)
+        time.sleep(2)
 
+def send_command(proc, command: str) -> None:
+    try:
+        proc.stdin.write((command + "\n").encode("utf-8"))
+        proc.stdin.flush()
+    except BrokenPipeError:
+        pass
 # Stand-in for a Bot row from the database
 bot = {
     "account": "Manobee",
     "login": os.environ["MC_LOGIN"],
     "server": "survival.manacube.com",
     "minecraft_version": "26.2",
+    "join_commands": ["/survival", "/home", "hi everyone"],
 }
 #login_account(bot["account"], bot["login"])
 # bot2 = {
