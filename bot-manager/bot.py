@@ -1,4 +1,4 @@
-from config import *
+from config import make_config
 from files import MCC_PATH, BOTS_DIR, generate_config
 import subprocess
 import time

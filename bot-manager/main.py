@@ -5,11 +5,6 @@ continuously fetches data from the database to check if any
 bot configuration/status has been updated, and will act acccordingly. 
 """
 import os
-import subprocess
-import time
-import threading
-import re
-import shutil
 from bot import spawn_bot
 from login import login_account
 

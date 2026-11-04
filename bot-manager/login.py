@@ -2,7 +2,8 @@ import threading
 import re
 import shutil
 import subprocess
-from files import BASE_DIR
+from pathlib import Path
+from files import BOTS_DIR
 
 
 def login_account(account, email):
@@ -16,7 +17,7 @@ def login_account(account, email):
     [Console.General]
     ConsoleColorMode = "disable"
     """
-    account_dir = BASE_DIR / account
+    account_dir = BOTS_DIR / account
     account_dir.mkdir(parents=True, exist_ok=True)
     config_path = account_dir / "login.ini"
     config_path.write_text(input_string)
