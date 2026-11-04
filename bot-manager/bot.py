@@ -37,6 +37,7 @@ def send_join_commands(proc,commands: list[str]) -> None:
 
 def send_command(proc, command: str) -> None:
     try:
+        print("Sending the command: " + command)
         proc.stdin.write((command + "\n").encode("utf-8"))
         proc.stdin.flush()
     except BrokenPipeError:

@@ -63,20 +63,21 @@ def print_login(proc, account_dir):
 
 
 # Stand-in for a Bot row from the database
-bot = {
-    "account": "Manobee",
-    "login": os.environ["MC_LOGIN"],
+# bot = {
+#     "account": "Manobee",
+#     "login": os.environ["MC_LOGIN"],
+#     "server": "survival.manacube.com",
+#     "minecraft_version": "26.2",
+#     "join_commands": ["/survival", "/home", "hi everyone"],
+# }
+#login_account(bot["account"], bot["login"])
+bot2 = {
+    "account": "TheGhost06",
+    "login": os.environ["MC_LOGIN2"],
     "server": "survival.manacube.com",
     "minecraft_version": "26.2",
     "join_commands": ["/survival", "/home", "hi everyone"],
 }
-#login_account(bot["account"], bot["login"])
-# bot2 = {
-#     "account": "Manobee",
-#     "login": os.environ["MC_LOGIN"],
-#     "server": "smp.newwind.club",
-#     "minecraft_version": "26.3",
-# }
 # bot3 = {
 #     "account": "logintest2",
 #     "login": os.environ["MC_LOGIN2"],
@@ -90,7 +91,7 @@ bot = {
 #     "server": "ml.zetrex.net",
 #     "minecraft_version": "26.3",
 # }
-spawn_bot(bot)
+spawn_bot(bot2)
 # spawn_bot(bot2)
 # spawn_bot(bot3)
 # spawn_bot(bot4)
